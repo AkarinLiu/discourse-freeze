@@ -3,7 +3,32 @@ en:
     admin:
       site_settings:
         categories:
-          TODO_plugin_name: "Plugin Name"
+          freeze: "Freeze"
+
+    freeze:
+      title: "Freeze Users"
+      description: "Manage frozen user accounts"
+
   js:
-    discourse_plugin_name:
-      placeholder: placeholder
+    freeze:
+      title: "Freeze Users"
+      description: "Manage frozen user accounts"
+
+      freeze_user: "Freeze User"
+      frozen_users: "Frozen Users"
+      unfreeze_button: "Unfreeze"
+      freeze_button: "Freeze"
+      search_placeholder: "Search users by username or email..."
+      select_reason: "Select a reason"
+      username: "Username"
+      column_reason: "Reason"
+      frozen_by: "Frozen By"
+      frozen_at: "Frozen At"
+      actions: "Actions"
+
+      reason:
+        account_stolen: "Account stolen"
+        user_deceased: "User has passed away"
+
+      memorial_message: "In loving memory of %{username}."
+      frozen_notice: "This account has been frozen."

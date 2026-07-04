@@ -1,0 +1,34 @@
+zh_CN:
+  admin_js:
+    admin:
+      site_settings:
+        categories:
+          freeze: "冻结"
+
+    freeze:
+      title: "冻结用户"
+      description: "管理已冻结的用户账号"
+
+  js:
+    freeze:
+      title: "冻结用户"
+      description: "管理已冻结的用户账号"
+
+      freeze_user: "冻结用户"
+      frozen_users: "已冻结用户"
+      unfreeze_button: "解冻"
+      freeze_button: "冻结"
+      search_placeholder: "按用户名或邮箱搜索用户..."
+      select_reason: "选择冻结原因"
+      username: "用户名"
+      column_reason: "冻结原因"
+      frozen_by: "冻结人"
+      frozen_at: "冻结时间"
+      actions: "操作"
+
+      reason:
+        account_stolen: "账号被盗"
+        user_deceased: "用户已离世"
+
+      memorial_message: "沉痛悼念 %{username}。"
+      frozen_notice: "此账号已被冻结。"
