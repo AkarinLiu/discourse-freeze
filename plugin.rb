@@ -26,8 +26,23 @@ module ::DiscourseFreeze
 
   FREEZE_REASON_LABELS = {
     "account_stolen" => "账号被盗",
-    "user_deceased"  => "用户已离世"
+    "user_deceased" => "用户已离世",
   }.freeze
+
+  module ApplicationControllerExtension
+    def check_user_frozen
+      if current_user.frozen?
+        render json: { errors: [I18n.t("freeze.errors.frozen_account")] }, status: :forbidden
+      end
+    end
+  end
+
+  module GuardianExtension
+    def can_see_profile?(user)
+      return true if UserFreezeRecord.currently_frozen_for?(user.id)
+      super
+    end
+  end
 end
 
 require_relative "lib/discourse_freeze/engine"
@@ -39,21 +54,14 @@ after_initialize do
   end
 
   # Block frozen users from accessing the site on every request
-  ::ApplicationController.class_eval do
-    prepend_before_action :check_user_frozen, if: :current_user
-
-    def check_user_frozen
-      if current_user.frozen?
-        render json: { errors: [I18n.t("freeze.errors.frozen_account")] }, status: 403
-      end
-    end
-  end
+  ::ApplicationController.prepend(DiscourseFreeze::ApplicationControllerExtension)
+  ::ApplicationController.prepend_before_action :check_user_frozen, if: :current_user
 
   # Expose freeze status in user serializer for profile display
   add_to_serializer(
     :user,
     :frozen_status,
-    include_condition: -> { UserFreezeRecord.currently_frozen_for?(object.id) }
+    include_condition: -> { UserFreezeRecord.currently_frozen_for?(object.id) },
   ) do
     record = UserFreezeRecord.currently_frozen_for(object.id)
     if record
@@ -62,21 +70,13 @@ after_initialize do
         reason: record.reason,
         reason_label: DiscourseFreeze::FREEZE_REASON_LABELS[record.reason],
         frozen_at: record.frozen_at.iso8601,
-        frozen_by: record.frozen_by&.username
+        frozen_by: record.frozen_by&.username,
       }
     end
   end
 
   # Make frozen users' profiles visible even if they set hide_profile
-  ::Guardian.class_eval do
-    module FrozenProfileGuardianExtension
-      def can_see_profile?(user)
-        return true if UserFreezeRecord.currently_frozen_for?(user.id)
-        super
-      end
-    end
-    prepend FrozenProfileGuardianExtension
-  end
+  ::Guardian.prepend(DiscourseFreeze::GuardianExtension)
 
   # Override profile_hidden in User serializer so frontend doesn't redirect
   add_to_serializer(:user, :profile_hidden) do

@@ -12,6 +12,8 @@ Discourse::Application.routes.draw do
 
   # Support direct navigation (refresh/bookmark) to Ember admin plugin sub-routes.
   # Core only defines plugins/:plugin_id and plugins/:plugin_id/settings.
-  get "/admin/plugins/discourse-freeze(/*path)" => "admin/plugins#show",
-      constraints: StaffConstraint.new
+  get(
+    "/admin/plugins/discourse-freeze(/*path)" => "admin/plugins#show",
+    constraints: StaffConstraint.new,
+  )
 end

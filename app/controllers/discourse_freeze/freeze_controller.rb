@@ -19,7 +19,7 @@ module ::DiscourseFreeze
             reason: record.reason,
             reason_label: DiscourseFreeze::FREEZE_REASON_LABELS[record.reason] || record.reason,
             frozen_by: record.frozen_by.username,
-            frozen_at: record.frozen_at
+            frozen_at: record.frozen_at,
           }
         end
 
@@ -30,7 +30,7 @@ module ::DiscourseFreeze
       user = User.find_by(id: params[:user_id])
       raise Discourse::NotFound if user.blank?
 
-      unless DiscourseFreeze::FREEZE_REASONS.include?(params[:reason])
+      if DiscourseFreeze::FREEZE_REASONS.exclude?(params[:reason])
         raise Discourse::InvalidParameters.new(:reason)
       end
 
@@ -47,14 +47,14 @@ module ::DiscourseFreeze
           user_id: user.id,
           frozen_by_id: current_user.id,
           reason: params[:reason],
-          frozen_at: Time.zone.now
+          frozen_at: Time.zone.now,
         )
 
       StaffActionLogger.new(current_user).log_custom(
         "freeze_user",
         user_id: user.id,
         username: user.username,
-        reason: params[:reason]
+        reason: params[:reason],
       )
 
       render json: success_json
@@ -72,7 +72,7 @@ module ::DiscourseFreeze
       StaffActionLogger.new(current_user).log_custom(
         "unfreeze_user",
         user_id: user.id,
-        username: user.username
+        username: user.username,
       )
 
       render json: success_json
